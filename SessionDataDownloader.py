@@ -1,6 +1,6 @@
 import fastf1
-from fastf1 import plotting
 import json
+import os
 
 fastf1.Cache.enable_cache('cache')  # replace with your cache directory
 
@@ -52,7 +52,7 @@ def load_chart_data(year, event, session, driver):
     driver_laps = session.laps.pick_driver(driver)
     # driver_laps['DriverColor'] = plotting.driver_color(driver)
 
-    return driver_laps[['LapNumber', 'LapTime', 'Compound']].to_json(orient="records")
+    return json.loads(driver_laps[['LapNumber', 'LapTime', 'Compound']].to_json(orient="records"))
 
 
-print(load_lap_telemetry(2023, 3, 'Q', 'VER', 18))
+print(load_chart_data(2023, 3, 'Q', 'VER'))
