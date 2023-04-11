@@ -55,4 +55,13 @@ def load_chart_data(year, event, session, driver):
     return json.loads(driver_laps[['LapNumber', 'LapTime', 'Compound']].to_json(orient="records"))
 
 
-print(load_chart_data(2023, 3, 'Q', 'VER'))
+def load_events_remaining():
+    events = fastf1.get_events_remaining()
+    events = events[['RoundNumber', 'Country', 'Location', 'OfficialEventName', 'EventDate', 'EventName', 'EventFormat']].to_json(orient="records")
+
+    return json.loads(events)
+
+
+print(json.dumps(load_lap_telemetry(2023, 3, 'Q', 'BOT', 11)))
+# print(json.dumps(load_chart_data(2023, 3, 'Q', 'VER')))
+# print(load_events_remaining())

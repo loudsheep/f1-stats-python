@@ -1,5 +1,6 @@
 import requests
 import fastf1
+import json
 
 fastf1.Cache.enable_cache("cache")  # replace with your cache directory
 
@@ -33,6 +34,7 @@ def calculate_max_points_for_remaining_season():
 def calculate_who_can_win(driver_standings, max_points):
     LEADER_POINTS = int(driver_standings[0]['points'])
 
+    obj = {}
     for _, driver in enumerate(driver_standings):
         driver_max_points = int(driver["points"]) + max_points
         can_win = 'No' if driver_max_points < LEADER_POINTS else 'Yes'
@@ -43,6 +45,14 @@ def calculate_who_can_win(driver_standings, max_points):
             Theoretical max points: {driver_max_points}, \
             Can win: {can_win}")
 
+        obj[driver['Driver']['code']] = {
+            "current_points": driver['points'],
+            "max_points": driver_max_points,
+            "can_win": True if can_win == "Yes" else False
+        }
+
+    return json.dumps(obj)
+
 
 # Get the current drivers standings
 driver_standings = get_drivers_standings()
@@ -51,4 +61,4 @@ driver_standings = get_drivers_standings()
 points = calculate_max_points_for_remaining_season()
 
 # Print which drivers can still win
-calculate_who_can_win(driver_standings, points)
+print(calculate_who_can_win(driver_standings, points))
