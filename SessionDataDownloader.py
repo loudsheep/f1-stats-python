@@ -1,8 +1,8 @@
+import datetime
 import fastf1
 import json
-import os
 
-fastf1.Cache.enable_cache('cache')  # replace with your cache directory
+fastf1.Cache.enable_cache('cache')
 
 
 def load_lap_telemetry(year, event, ses, driver, lap_number):
@@ -55,13 +55,39 @@ def load_chart_data(year, event, session, driver):
     return json.loads(driver_laps[['LapNumber', 'LapTime', 'Compound']].to_json(orient="records"))
 
 
-def load_events_remaining():
+def get_events_remaining():
     events = fastf1.get_events_remaining()
-    events = events[['RoundNumber', 'Country', 'Location', 'OfficialEventName', 'EventDate', 'EventName', 'EventFormat']].to_json(orient="records")
+    events = events[
+        ['RoundNumber', 'Country', 'Location', 'OfficialEventName', 'EventDate', 'EventName', 'EventFormat']].to_json(
+        orient="records", date_format="iso")
 
     return json.loads(events)
 
 
-print(json.dumps(load_lap_telemetry(2023, 3, 'Q', 'BOT', 11)))
-# print(json.dumps(load_chart_data(2023, 3, 'Q', 'VER')))
+def get_past_events(year: int):
+    events = fastf1.get_event_schedule(year, include_testing=False)
+    next_event = fastf1.get_events_remaining().iloc[0]
+
+    events = events.loc[events['Session5Date'] < next_event['Session5Date']]
+    events = events[
+        ['RoundNumber', 'Country', 'Location', 'OfficialEventName', 'EventDate', 'EventName', 'EventFormat']].to_json(
+        orient="records", date_format="iso")
+
+    return json.loads(events)
+
+
+def get_sessions_in_event(year: int, event: int | str):
+    event = fastf1.get_event(year, event)
+
+    sessions = []
+    for i in range(1, 6):
+        if event["Session" + str(i) + "Date"] < datetime.datetime.now():
+            sessions.append(event["Session" + str(i)])
+
+    return json.dumps(sessions)
+
+
+# print(json.dumps(load_lap_telemetry(2023, 3, 'Qualifying', 'BOT', 11)))
+print(json.dumps(load_chart_data(2023, 3, 'Qualifying', 'VER')))
 # print(load_events_remaining())
+# print(get_sessions_in_event(2023, 3))
