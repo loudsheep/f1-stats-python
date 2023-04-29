@@ -18,13 +18,13 @@ def load_lap_telemetry(year, event, ses, driver, lap_number):
          14: True}, inplace=True)
 
     track_map = telemetry[['X', 'Y']].to_json(orient="records")
-    time = telemetry[['Distance', 'Time']].to_json(orient="records")
-    throttle = telemetry[['Distance', 'Throttle']].to_json(orient="records")
-    brake = telemetry[['Distance', 'Brake']].to_json(orient="records")
-    speed = telemetry[['Distance', 'Speed']].to_json(orient="records")
-    rpm = telemetry[['Distance', 'RPM']].to_json(orient="records")
-    gear = telemetry[['Distance', 'nGear']].to_json(orient="records")
-    drs = telemetry[['Distance', 'DRS']].to_json(orient="records")
+    time = telemetry[['X', 'Y']].to_json(orient="records")
+    throttle = telemetry[['X', 'Y']].to_json(orient="records")
+    brake = telemetry[['X', 'Y']].to_json(orient="records")
+    speed = telemetry[['X', 'Y']].to_json(orient="records")
+    rpm = telemetry[['X', 'Y']].to_json(orient="records")
+    gear = telemetry[['X', 'Y']].to_json(orient="records")
+    drs = telemetry[['X', 'Y']].to_json(orient="records")
 
     obj = {
         "year": year,
@@ -87,7 +87,7 @@ def get_sessions_in_event(year: int, event: int | str):
     return json.dumps(sessions)
 
 
-# print(json.dumps(load_lap_telemetry(2023, 3, 'Qualifying', 'BOT', 11)))
-print(json.dumps(load_chart_data(2023, 3, 'Qualifying', 'VER')))
+print(json.dumps(load_lap_telemetry(2023, 3, 'Qualifying', 'BOT', 11)))
+# print(json.dumps(load_chart_data(2023, 3, 'Qualifying', 'VER')))
 # print(load_events_remaining())
 # print(get_sessions_in_event(2023, 3))
