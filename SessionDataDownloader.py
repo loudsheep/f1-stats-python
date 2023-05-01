@@ -18,13 +18,14 @@ def load_lap_telemetry(year, event, ses, driver, lap_number):
          14: True}, inplace=True)
 
     track_map = telemetry[['X', 'Y']].to_json(orient="records")
-    time = telemetry[['X', 'Y']].to_json(orient="records")
-    throttle = telemetry[['X', 'Y']].to_json(orient="records")
-    brake = telemetry[['X', 'Y']].to_json(orient="records")
-    speed = telemetry[['X', 'Y']].to_json(orient="records")
-    rpm = telemetry[['X', 'Y']].to_json(orient="records")
-    gear = telemetry[['X', 'Y']].to_json(orient="records")
-    drs = telemetry[['X', 'Y']].to_json(orient="records")
+    time = telemetry[['Distance', 'Time']].to_json(orient="records").replace("Distance", "X").replace("Time", "Y")
+    throttle = telemetry[['Distance', 'Throttle']].to_json(orient="records").replace("Distance", "X").replace(
+        "Throttle", "Y")
+    brake = telemetry[['Distance', 'Brake']].to_json(orient="records").replace("Distance", "X").replace("Brake", "Y")
+    speed = telemetry[['Distance', 'Speed']].to_json(orient="records").replace("Distance", "X").replace("Speed", "Y")
+    rpm = telemetry[['Distance', 'RPM']].to_json(orient="records").replace("Distance", "X").replace("RPM", "Y")
+    gear = telemetry[['Distance', 'nGear']].to_json(orient="records").replace("Distance", "X").replace("nGear", "Y")
+    drs = telemetry[['Distance', 'DRS']].to_json(orient="records").replace("Distance", "X").replace("DRS", "Y")
 
     obj = {
         "year": year,
@@ -87,7 +88,19 @@ def get_sessions_in_event(year: int, event: int | str):
     return json.dumps(sessions)
 
 
-print(json.dumps(load_lap_telemetry(2023, 3, 'Qualifying', 'BOT', 11)))
+def get_drivers_in_session(year, event, session):
+    session = fastf1.get_session(year, event, session)
+    session.load()
+
+    results = session.results[['DriverNumber', 'Abbreviation', 'TeamName', 'TeamColor']].to_json(
+        orient="records", date_format="iso")
+
+    return json.loads(results)
+
+
+# print(json.dumps(load_lap_telemetry(2023, 4, 'Race', 'VER', 51)))
 # print(json.dumps(load_chart_data(2023, 3, 'Qualifying', 'VER')))
-# print(load_events_remaining())
-# print(get_sessions_in_event(2023, 3))
+# print(get_events_remaining())
+# print(get_sessions_in_event(2023, 4))
+# print(get_past_events(2023))
+# print(get_drivers_in_session(2023, 4, "Q"))
