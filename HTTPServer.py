@@ -9,10 +9,55 @@ class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         parsed_path = urllib.parse.urlparse(self.path)
         query_params = urllib.parse.parse_qs(parsed_path.query)
+        print(query_params)
 
         if parsed_path.path == '/schedule':
-            x = get_events_remaining()
-            data = {'status': '200', 'data': x}
+            data = {'status': '200', 'data': get_events_remaining()}
+
+        elif parsed_path.path == '/telemetry':
+            if not "year" in query_params:
+                self.send_error(400)
+                return
+            if not "event" in query_params:
+                self.send_error(400)
+                return
+            if not "session" in query_params:
+                self.send_error(400)
+                return
+            if not "driver" in query_params:
+                self.send_error(400)
+                return
+            if not "lap" in query_params:
+                self.send_error(400)
+                return
+
+            data = {'status': '200',
+                    'data': load_lap_telemetry(int(query_params['year'][0]), int(query_params['event'][0]),
+                                               query_params['session'][0], query_params['driver'][0],
+                                               int(query_params['lap'][0]))}
+
+        elif parsed_path.path == '/sessions':
+            if not "year" in query_params:
+                self.send_error(400)
+                return
+
+            data = {'status': '200',
+                    'data': get_past_events(int(query_params['year'][0]))}
+
+        elif parsed_path.path == '/drivers':
+            if not "year" in query_params:
+                self.send_error(400)
+                return
+            if not "event" in query_params:
+                self.send_error(400)
+                return
+            if not "session" in query_params:
+                self.send_error(400)
+                return
+
+            data = {'status': '200',
+                    'data': get_drivers_in_session(int(query_params['year'][0]), int(query_params['event'][0]),
+                                                   query_params['session'][0])}
 
         elif parsed_path.path == '/':
             if 'param1' in query_params:
@@ -29,8 +74,6 @@ class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
         self.send_header('Content-type', 'application/json')
         self.send_header("Access-Control-Allow-Origin", "*")
-        # self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        # self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
         self.wfile.write(json.dumps(data).encode())
@@ -38,9 +81,6 @@ class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self.send_response(200, "ok")
         self.send_header('Access-Control-Allow-Origin', '*')
-        # self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        # self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
-        # self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
 

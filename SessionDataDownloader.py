@@ -71,10 +71,16 @@ def get_past_events(year: int):
 
     events = events.loc[events['Session5Date'] < next_event['Session5Date']]
     events = events[
-        ['RoundNumber', 'Country', 'Location', 'OfficialEventName', 'EventDate', 'EventName', 'EventFormat']].to_json(
+        ['RoundNumber', 'Country', 'Location', 'OfficialEventName', 'EventDate', 'EventName', 'EventFormat']]
+    events = events.to_json(
         orient="records", date_format="iso")
 
-    return json.loads(events)
+    events = json.loads(events)
+
+    for i in events:
+        i['Sessions'] = get_sessions_in_event(year, i['RoundNumber'])
+
+    return events
 
 
 def get_sessions_in_event(year: int, event: int | str):
@@ -85,10 +91,15 @@ def get_sessions_in_event(year: int, event: int | str):
         if event["Session" + str(i) + "Date"] < datetime.datetime.now():
             sessions.append(event["Session" + str(i)])
 
-    return json.dumps(sessions)
+    return sessions
 
 
 def get_drivers_in_session(year, event, session):
+    if session == "SS":
+        session = "SQ"
+    elif session == "Sprint Shootout":
+        session = "Sprint Qualifying"
+
     session = fastf1.get_session(year, event, session)
     session.load()
 
@@ -103,4 +114,4 @@ def get_drivers_in_session(year, event, session):
 # print(get_events_remaining())
 # print(get_sessions_in_event(2023, 4))
 # print(get_past_events(2023))
-# print(get_drivers_in_session(2023, 4, "Q"))
+# print(get_drivers_in_session(2023, 4, "SS"))
