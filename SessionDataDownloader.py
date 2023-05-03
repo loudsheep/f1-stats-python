@@ -1,7 +1,9 @@
 import datetime
 import fastf1
 import json
+import pytz
 
+utc = pytz.UTC
 fastf1.Cache.enable_cache('cache')
 
 
@@ -88,13 +90,13 @@ def get_sessions_in_event(year: int, event: int | str):
 
     sessions = []
     for i in range(1, 6):
-        if event["Session" + str(i) + "Date"] < datetime.datetime.now():
+        if event["Session" + str(i) + "Date"].replace(tzinfo=utc) < datetime.datetime.now().replace(tzinfo=utc):
             sessions.append(event["Session" + str(i)])
 
     return sessions
 
 
-def get_drivers_in_session(year, event, session):
+def get_session_results(year, event, session):
     if session == "SS":
         session = "SQ"
     elif session == "Sprint Shootout":
@@ -103,15 +105,16 @@ def get_drivers_in_session(year, event, session):
     session = fastf1.get_session(year, event, session)
     session.load()
 
-    results = session.results[['DriverNumber', 'Abbreviation', 'TeamName', 'TeamColor']].to_json(
+    results = session.results[
+        ['DriverNumber', 'Abbreviation', 'FullName', 'TeamName', 'TeamColor', 'Position', 'Status', 'Points']].to_json(
         orient="records", date_format="iso")
 
     return json.loads(results)
 
 
 # print(json.dumps(load_lap_telemetry(2023, 4, 'Race', 'VER', 51)))
-# print(json.dumps(load_chart_data(2023, 3, 'Qualifying', 'VER')))
+# print(json.dumps(load_chart_data(2023, 4, 'Qualifying', 'VER')))
 # print(get_events_remaining())
 # print(get_sessions_in_event(2023, 4))
 # print(get_past_events(2023))
-# print(get_drivers_in_session(2023, 4, "SS"))
+# print(get_session_results(2023, 4, 'S'))

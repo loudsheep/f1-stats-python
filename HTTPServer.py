@@ -2,6 +2,7 @@ import http.server
 import json
 import urllib.parse
 from SessionDataDownloader import *
+from StandingsDownloader import *
 
 
 class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
@@ -44,7 +45,7 @@ class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             data = {'status': '200',
                     'data': get_past_events(int(query_params['year'][0]))}
 
-        elif parsed_path.path == '/drivers':
+        elif parsed_path.path == '/results':
             if not "year" in query_params:
                 self.send_error(400)
                 return
@@ -56,8 +57,34 @@ class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 return
 
             data = {'status': '200',
-                    'data': get_drivers_in_session(int(query_params['year'][0]), int(query_params['event'][0]),
-                                                   query_params['session'][0])}
+                    'data': get_session_results(int(query_params['year'][0]), int(query_params['event'][0]),
+                                                query_params['session'][0])}
+
+        elif parsed_path.path == '/standings':
+            if not "year" in query_params:
+                self.send_error(400)
+                return
+
+            data = {'status': '200',
+                    'data': get_season_standings(int(query_params['year'][0]))}
+
+        elif parsed_path.path == '/laps':
+            if not "year" in query_params:
+                self.send_error(400)
+                return
+            if not "event" in query_params:
+                self.send_error(400)
+                return
+            if not "session" in query_params:
+                self.send_error(400)
+                return
+            if not "driver" in query_params:
+                self.send_error(400)
+                return
+
+            data = {'status': '200',
+                    'data': load_chart_data(int(query_params['year'][0]), int(query_params['event'][0]),
+                                            query_params['session'][0], query_params['driver'][0])}
 
         elif parsed_path.path == '/':
             if 'param1' in query_params:
