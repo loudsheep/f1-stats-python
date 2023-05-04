@@ -3,12 +3,57 @@ import pandas as pd
 from fastf1.ergast import Ergast
 import fastf1
 import json
+import os
+import datetime
 
 fastf1.Cache.enable_cache('cache')
+
+
+def get_cached_data_round(year):
+    if os.path.exists('./cache/standings/' + str(year) + '.txt'):
+        with open('./cache/standings/' + str(year) + '.txt') as f:
+            lines = f.readlines()
+            round = int(lines[0])
+        return round
+
+    return 0
+
+
+def get_cached_data(year):
+    if os.path.exists('./cache/standings/' + str(year) + '.txt'):
+        with open('./cache/standings/' + str(year) + '.txt') as f:
+            lines = f.readlines()
+            data = lines[1]
+        return json.loads(data)
+
+    return None
+
+
+def write_to_cache(year, round, data):
+    if not os.path.exists('./cache/standings/'):
+        os.makedirs('./cache/standings/')
+
+    with open('./cache/standings/' + str(year) + '.txt', 'w') as f:
+        f.writelines([str(round) + '\n', data])
+
 
 def get_season_standings(year: int):
     ergast = Ergast()
     races = ergast.get_race_schedule(year)
+
+    last_round = 0
+    for index, race in races.iterrows():
+        if race['raceDate'] < datetime.date.today():
+            last_round = race['round']
+        else:
+            break
+        # raceDatetime = datetime.datetime
+    cached_data_round = get_cached_data_round(year)
+
+    if cached_data_round >= last_round:
+        return get_cached_data(year)
+
+    print("GETTING NEW DATA FOR ROUND " + str(last_round) + " OF " + str(year) + " SEASON")
     results = []
 
     for rnd, race in races['raceName'].items():
@@ -43,5 +88,7 @@ def get_season_standings(year: int):
     results.drop(columns='total_points', inplace=True)
 
     results.columns = races
+
+    write_to_cache(year, last_round, results.to_json())
 
     return json.loads(results.to_json())

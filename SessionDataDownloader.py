@@ -111,7 +111,6 @@ def get_session_results(year, event, session):
 
     return json.loads(results)
 
-
 # print(json.dumps(load_lap_telemetry(2023, 4, 'Race', 'VER', 51)))
 # print(json.dumps(load_chart_data(2023, 4, 'Qualifying', 'VER')))
 # print(get_events_remaining())
