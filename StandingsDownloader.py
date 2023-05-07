@@ -43,14 +43,18 @@ def get_season_standings(year: int):
 
     last_round = 0
     for index, race in races.iterrows():
-        if race['raceDate'] < datetime.date.today():
+        if race['raceDate'] < pd.Timestamp.now():
             last_round = race['round']
         else:
             break
         # raceDatetime = datetime.datetime
     cached_data_round = get_cached_data_round(year)
+    print(last_round)
 
     if cached_data_round >= last_round:
+        return get_cached_data(year)
+
+    if len(ergast.get_race_results(season=year, round=last_round).content) == 0:
         return get_cached_data(year)
 
     print("GETTING NEW DATA FOR ROUND " + str(last_round) + " OF " + str(year) + " SEASON")
