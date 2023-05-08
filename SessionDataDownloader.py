@@ -50,10 +50,9 @@ def load_lap_telemetry(year, event, ses, driver, lap_number):
 
 def load_chart_data(year, event, session, driver):
     session = fastf1.get_session(year, event, session)
-    session.load()
+    session.load(telemetry=False, weather=False, messages=False)
 
     driver_laps = session.laps.pick_driver(driver)
-    # driver_laps['DriverColor'] = plotting.driver_color(driver)
 
     return json.loads(driver_laps[['LapNumber', 'LapTime', 'Compound']].to_json(orient="records"))
 
@@ -103,17 +102,10 @@ def get_session_results(year, event, session):
         session = "Sprint Qualifying"
 
     session = fastf1.get_session(year, event, session)
-    session.load()
+    session.load(telemetry=False, weather=False, messages=False, laps=False)
 
     results = session.results[
         ['DriverNumber', 'Abbreviation', 'FullName', 'TeamName', 'TeamColor', 'Position', 'Status', 'Points']].to_json(
         orient="records", date_format="iso")
 
     return json.loads(results)
-
-# print(json.dumps(load_lap_telemetry(2023, 4, 'Race', 'VER', 51)))
-# print(json.dumps(load_chart_data(2023, 4, 'Qualifying', 'VER')))
-# print(get_events_remaining())
-# print(get_sessions_in_event(2023, 4))
-# print(get_past_events(2023))
-# print(get_session_results(2023, 4, 'S'))

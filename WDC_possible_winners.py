@@ -39,26 +39,10 @@ def calculate_who_can_win(driver_standings, max_points):
         driver_max_points = int(driver["points"]) + max_points
         can_win = 'No' if driver_max_points < LEADER_POINTS else 'Yes'
 
-        print(f"{driver['position']}: \
-            {driver['Driver']['code']}, \
-            Current points: {driver['points']}, \
-            Theoretical max points: {driver_max_points}, \
-            Can win: {can_win}")
-
         obj[driver['Driver']['code']] = {
             "current_points": driver['points'],
             "max_points": driver_max_points,
             "can_win": True if can_win == "Yes" else False
         }
 
-    return json.dumps(obj)
-
-
-# Get the current drivers standings
-driver_standings = get_drivers_standings()
-
-# Get the maximum amount of points
-points = calculate_max_points_for_remaining_season()
-
-# Print which drivers can still win
-print(calculate_who_can_win(driver_standings, points))
+    return obj

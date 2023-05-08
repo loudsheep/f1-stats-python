@@ -3,6 +3,7 @@ import json
 import urllib.parse
 from SessionDataDownloader import *
 from StandingsDownloader import *
+from WDC_possible_winners import *
 
 
 class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
@@ -68,6 +69,12 @@ class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             data = {'status': '200',
                     'data': get_season_standings(int(query_params['year'][0]))}
 
+        elif parsed_path.path == '/winners':
+            driver_standings = get_drivers_standings()
+            points = calculate_max_points_for_remaining_season()
+            data = {'status': '200',
+                    'data': calculate_who_can_win(driver_standings, points)}
+
         elif parsed_path.path == '/laps':
             if not "year" in query_params:
                 self.send_error(400)
@@ -87,12 +94,7 @@ class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                                             query_params['session'][0], query_params['driver'][0])}
 
         elif parsed_path.path == '/':
-            if 'param1' in query_params:
-                data = {'response': 'This is data for param1.'}
-            elif 'param2' in query_params:
-                data = {'response': 'This is data for param2.'}
-            else:
-                data = {'response': 'This is default data.'}
+            data = {'status': '200', 'data': 'This is default data.'}
         else:
             self.send_error(404)
             return

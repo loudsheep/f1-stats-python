@@ -4,7 +4,7 @@ from fastf1.ergast import Ergast
 import fastf1
 import json
 import os
-import datetime
+import pycountry
 
 fastf1.Cache.enable_cache('cache')
 
@@ -43,33 +43,52 @@ def get_season_standings(year: int):
 
     last_round = 0
     for index, race in races.iterrows():
-        if race['raceDate'] < pd.Timestamp.now():
+        if race['raceDate'].date() < pd.Timestamp.today().date():
             last_round = race['round']
         else:
             break
-        # raceDatetime = datetime.datetime
     cached_data_round = get_cached_data_round(year)
-    print(last_round)
 
     if cached_data_round >= last_round:
         return get_cached_data(year)
 
-    if len(ergast.get_race_results(season=year, round=last_round).content) == 0:
-        return get_cached_data(year)
+    rounds = []
+    for i in races['round']:
+        race = races.loc[i - 1]
+        if race['country'] == 'UAE':
+            country_code = 'AE'
+        elif race['country'] == 'UK':
+            country_code = 'GB'
+        else:
+            country_code = pycountry.countries.search_fuzzy(race['country'])[0].alpha_2
 
-    print("GETTING NEW DATA FOR ROUND " + str(last_round) + " OF " + str(year) + " SEASON")
+        if race['raceName'][:3] == "Aus":
+            race_code = pycountry.countries.search_fuzzy(race['country'])[0].alpha_3
+        else:
+            race_code = race['raceName'][:3].upper()
+        rounds.append({
+            'country': race['country'],
+            'countryCode': country_code,
+            'raceCode': race_code
+        })
+
+    standings = ergast.get_driver_standings(year)
+    drivers = []
+    for i in standings.content[0]['driverCode'].items():
+        drivers.append(i[1])
+
     results = []
 
     for rnd, race in races['raceName'].items():
         temp = ergast.get_race_results(season=year, round=rnd + 1)
         if len(temp.content) == 0:
-            re = results[-1].copy()
-            re['round'] = rnd + 1
-            re['race'] = race.removesuffix(' Grand Prix')
-            re['points'] = None
-            results.append(re)
+            for d in drivers:
+                results.append({
+                    'driver': d,
+                    'race': rounds[rnd]['raceCode'],
+                    'points': None
+                })
             continue
-
         temp = temp.content[0]
 
         sprint = ergast.get_sprint_results(season=year, round=rnd + 1)
@@ -78,21 +97,22 @@ def get_season_standings(year: int):
             temp['points'] = temp['points_x'] + temp['points_y']
             temp.drop(columns=['points_x', 'points_y'], inplace=True)
 
-        temp['round'] = rnd + 1
-        temp['race'] = race.removesuffix(' Grand Prix')
-        temp = temp[['round', 'race', 'driverCode', 'points']]
-        results.append(temp)
-    results = pd.concat(results)
-    races = results['race'].drop_duplicates()
+        temp['race'] = rounds[rnd]['raceCode']
+        temp = temp[['race', 'driverCode', 'points']]
 
-    results = results.pivot(index='driverCode', columns='round', values='points')
+        for idx, row in temp.iterrows():
+            results.append({
+                'driver': row['driverCode'],
+                'race': row['race'],
+                'points': row['points']
+            })
 
-    results['total_points'] = results.sum(axis=1)
-    results = results.sort_values(by='total_points', ascending=False)
-    results.drop(columns='total_points', inplace=True)
+    ret = {
+        'races': rounds,
+        'drivers': drivers,
+        'chartData': results
+    }
 
-    results.columns = races
+    write_to_cache(year, last_round, json.dumps(ret))
 
-    write_to_cache(year, last_round, results.to_json())
-
-    return json.loads(results.to_json())
+    return ret
