@@ -89,6 +89,8 @@ def get_sessions_in_event(year: int, event: int | str):
 
     sessions = []
     for i in range(1, 6):
+        if event["Session" + str(i) + "Date"] is None:
+            continue
         if event["Session" + str(i) + "Date"].replace(tzinfo=utc) < datetime.datetime.now().replace(tzinfo=utc):
             sessions.append(event["Session" + str(i)])
 
