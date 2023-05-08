@@ -69,6 +69,14 @@ class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             data = {'status': '200',
                     'data': get_season_standings(int(query_params['year'][0]))}
 
+        elif parsed_path.path == '/positions':
+            if not "year" in query_params:
+                self.send_error(400)
+                return
+
+            data = {'status': '200',
+                    'data': get_race_positions(int(query_params['year'][0]))}
+
         elif parsed_path.path == '/winners':
             driver_standings = get_drivers_standings()
             points = calculate_max_points_for_remaining_season()
