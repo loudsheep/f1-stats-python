@@ -54,12 +54,12 @@ def load_chart_data(year, event, session, driver):
     session.load(telemetry=False, weather=False, messages=False)
 
     driver_laps = session.laps.pick_driver(driver)
+    driver_laps = driver_laps.drop(driver_laps[driver_laps.IsAccurate == False].index)
 
     return json.loads(driver_laps[['LapNumber', 'LapTime', 'Compound']].to_json(orient="records"))
 
 
 def add_country_code(pd_row):
-    print(pd_row['Country'])
     if pd_row['Country'] == 'UAE' or pd_row['Country'] == 'Abu Dhabi':
         return 'AE'
     elif pd_row['Country'] == 'UK':
