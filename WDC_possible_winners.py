@@ -40,7 +40,7 @@ def calculate_who_can_win(driver_standings, max_points):
         can_win = 'No' if driver_max_points < LEADER_POINTS else 'Yes'
 
         obj[driver['Driver']['code']] = {
-            "current_points": driver['points'],
+            "current_points": int(driver['points']),
             "max_points": driver_max_points,
             "can_win": True if can_win == "Yes" else False
         }

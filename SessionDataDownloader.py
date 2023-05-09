@@ -2,6 +2,7 @@ import datetime
 import fastf1
 import json
 import pytz
+import pycountry
 
 utc = pytz.UTC
 fastf1.Cache.enable_cache('cache')
@@ -57,10 +58,23 @@ def load_chart_data(year, event, session, driver):
     return json.loads(driver_laps[['LapNumber', 'LapTime', 'Compound']].to_json(orient="records"))
 
 
+def add_country_code(pd_row):
+    print(pd_row['Country'])
+    if pd_row['Country'] == 'UAE' or pd_row['Country'] == 'Abu Dhabi':
+        return 'AE'
+    elif pd_row['Country'] == 'UK':
+        return 'GB'
+    else:
+        return pycountry.countries.search_fuzzy(pd_row['Country'])[0].alpha_2
+
+
 def get_events_remaining():
     events = fastf1.get_events_remaining()
+
+    events['CountryCode'] = events.apply(lambda x: add_country_code(x), axis=1)
     events = events[
-        ['RoundNumber', 'Country', 'Location', 'OfficialEventName', 'EventDate', 'EventName', 'EventFormat']].to_json(
+        ['RoundNumber', 'Country', 'Location', 'OfficialEventName', 'EventDate', 'EventName', 'EventFormat',
+         'CountryCode']].to_json(
         orient="records", date_format="iso")
 
     return json.loads(events)
