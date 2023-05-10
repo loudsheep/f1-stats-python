@@ -10,15 +10,15 @@ fastf1.Cache.enable_cache('cache')
 
 def load_lap_telemetry(year, event, ses, driver, lap_number):
     session = fastf1.get_session(year, event, ses)
-    session.load()
+    session.load(weather=False, messages=False)
 
     driver_laps = session.laps.pick_driver(driver)
 
     telemetry = driver_laps.loc[driver_laps['LapNumber'] == lap_number].get_telemetry().add_distance()
 
-    telemetry["DRS"].replace(
-        {0: False, 1: False, 2: False, 3: False, 8: False, 10: True, 12: True,
-         14: True}, inplace=True)
+    # telemetry["DRS"].replace(
+    #     {0: False, 1: False, 2: False, 3: False, 8: False, 10: True, 12: True,
+    #      14: True}, inplace=True)
 
     track_map = telemetry[['X', 'Y']].to_json(orient="records")
     time = telemetry[['Distance', 'Time']].to_json(orient="records").replace("Distance", "X").replace("Time", "Y")

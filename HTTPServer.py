@@ -9,111 +9,114 @@ from WDC_possible_winners import *
 class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def do_GET(self):
-        parsed_path = urllib.parse.urlparse(self.path)
-        query_params = urllib.parse.parse_qs(parsed_path.query)
-        print(query_params)
+        try:
+            parsed_path = urllib.parse.urlparse(self.path)
+            query_params = urllib.parse.parse_qs(parsed_path.query)
+            print(query_params)
 
-        if parsed_path.path == '/schedule':
-            data = {'status': '200', 'data': get_events_remaining()}
+            if parsed_path.path == '/schedule':
+                data = {'status': '200', 'data': get_events_remaining()}
 
-        elif parsed_path.path == '/telemetry':
-            if not "year" in query_params:
-                self.send_error(400)
+            elif parsed_path.path == '/telemetry':
+                if not "year" in query_params:
+                    self.send_error(400)
+                    return
+                if not "event" in query_params:
+                    self.send_error(400)
+                    return
+                if not "session" in query_params:
+                    self.send_error(400)
+                    return
+                if not "driver" in query_params:
+                    self.send_error(400)
+                    return
+                if not "lap" in query_params:
+                    self.send_error(400)
+                    return
+
+                data = {'status': '200',
+                        'data': load_lap_telemetry(int(query_params['year'][0]), int(query_params['event'][0]),
+                                                   query_params['session'][0], query_params['driver'][0],
+                                                   int(query_params['lap'][0]))}
+
+            elif parsed_path.path == '/sessions':
+                if not "year" in query_params:
+                    self.send_error(400)
+                    return
+
+                data = {'status': '200',
+                        'data': get_past_events(int(query_params['year'][0]))}
+
+            elif parsed_path.path == '/results':
+                if not "year" in query_params:
+                    self.send_error(400)
+                    return
+                if not "event" in query_params:
+                    self.send_error(400)
+                    return
+                if not "session" in query_params:
+                    self.send_error(400)
+                    return
+
+                data = {'status': '200',
+                        'data': get_session_results(int(query_params['year'][0]), int(query_params['event'][0]),
+                                                    query_params['session'][0])}
+
+            elif parsed_path.path == '/standings':
+                if not "year" in query_params:
+                    self.send_error(400)
+                    return
+
+                data = {'status': '200',
+                        'data': get_season_standings(int(query_params['year'][0]))}
+
+            elif parsed_path.path == '/positions':
+                if not "year" in query_params:
+                    self.send_error(400)
+                    return
+
+                data = {'status': '200',
+                        'data': get_race_positions(int(query_params['year'][0]))}
+
+            elif parsed_path.path == '/winners':
+                driver_standings = get_drivers_standings()
+                points = calculate_max_points_for_remaining_season()
+                data = {'status': '200',
+                        'data': calculate_who_can_win(driver_standings, points)}
+
+            elif parsed_path.path == '/laps':
+                if not "year" in query_params:
+                    self.send_error(400)
+                    return
+                if not "event" in query_params:
+                    self.send_error(400)
+                    return
+                if not "session" in query_params:
+                    self.send_error(400)
+                    return
+                if not "driver" in query_params:
+                    self.send_error(400)
+                    return
+
+                data = {'status': '200',
+                        'data': load_chart_data(int(query_params['year'][0]), int(query_params['event'][0]),
+                                                query_params['session'][0], query_params['driver'][0])}
+
+            elif parsed_path.path == '/':
+                data = {'status': '200', 'data': 'This is default data.'}
+            else:
+                self.send_error(404)
                 return
-            if not "event" in query_params:
-                self.send_error(400)
-                return
-            if not "session" in query_params:
-                self.send_error(400)
-                return
-            if not "driver" in query_params:
-                self.send_error(400)
-                return
-            if not "lap" in query_params:
-                self.send_error(400)
-                return
 
-            data = {'status': '200',
-                    'data': load_lap_telemetry(int(query_params['year'][0]), int(query_params['event'][0]),
-                                               query_params['session'][0], query_params['driver'][0],
-                                               int(query_params['lap'][0]))}
+            self.send_response(200)
 
-        elif parsed_path.path == '/sessions':
-            if not "year" in query_params:
-                self.send_error(400)
-                return
+            self.send_header('Content-type', 'application/json')
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
 
-            data = {'status': '200',
-                    'data': get_past_events(int(query_params['year'][0]))}
-
-        elif parsed_path.path == '/results':
-            if not "year" in query_params:
-                self.send_error(400)
-                return
-            if not "event" in query_params:
-                self.send_error(400)
-                return
-            if not "session" in query_params:
-                self.send_error(400)
-                return
-
-            data = {'status': '200',
-                    'data': get_session_results(int(query_params['year'][0]), int(query_params['event'][0]),
-                                                query_params['session'][0])}
-
-        elif parsed_path.path == '/standings':
-            if not "year" in query_params:
-                self.send_error(400)
-                return
-
-            data = {'status': '200',
-                    'data': get_season_standings(int(query_params['year'][0]))}
-
-        elif parsed_path.path == '/positions':
-            if not "year" in query_params:
-                self.send_error(400)
-                return
-
-            data = {'status': '200',
-                    'data': get_race_positions(int(query_params['year'][0]))}
-
-        elif parsed_path.path == '/winners':
-            driver_standings = get_drivers_standings()
-            points = calculate_max_points_for_remaining_season()
-            data = {'status': '200',
-                    'data': calculate_who_can_win(driver_standings, points)}
-
-        elif parsed_path.path == '/laps':
-            if not "year" in query_params:
-                self.send_error(400)
-                return
-            if not "event" in query_params:
-                self.send_error(400)
-                return
-            if not "session" in query_params:
-                self.send_error(400)
-                return
-            if not "driver" in query_params:
-                self.send_error(400)
-                return
-
-            data = {'status': '200',
-                    'data': load_chart_data(int(query_params['year'][0]), int(query_params['event'][0]),
-                                            query_params['session'][0], query_params['driver'][0])}
-
-        elif parsed_path.path == '/':
-            data = {'status': '200', 'data': 'This is default data.'}
-        else:
-            self.send_error(404)
-            return
-
-        self.send_response(200)
-
-        self.send_header('Content-type', 'application/json')
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-
-        self.wfile.write(json.dumps(data).encode())
+            self.wfile.write(json.dumps(data).encode())
+        except:
+            self.send_error(500)
 
     def do_OPTIONS(self):
         self.send_response(200, "ok")
