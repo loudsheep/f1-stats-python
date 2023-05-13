@@ -62,13 +62,27 @@ class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                         'data': get_session_results(int(query_params['year'][0]), int(query_params['event'][0]),
                                                     query_params['session'][0])}
 
-            elif parsed_path.path == '/standings':
+            elif parsed_path.path == '/heatmap':
                 if not "year" in query_params:
                     self.send_error(400)
                     return
+                if not "category" in query_params:
+                    self.send_error(400)
+                    return
 
-                data = {'status': '200',
-                        'data': get_season_standings(int(query_params['year'][0]))}
+                if query_params['category'][0] == "points":
+                    data = {'status': '200',
+                            'data': get_points_heatmap_data(int(query_params['year'][0]))}
+                elif query_params['category'][0] == "positions":
+                    data = {'status': '200',
+                            'data': get_race_position_heatmap_data(int(query_params['year'][0]))}
+                elif query_params['category'][0] == "qualifying":
+                    data = {'status': '200',
+                            'data': get_qualifying_position_heatmap_data(int(query_params['year'][0]))}
+
+                else:
+                    self.send_error(400)
+                    return
 
             elif parsed_path.path == '/positions':
                 if not "year" in query_params:
