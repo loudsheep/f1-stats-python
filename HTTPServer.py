@@ -1,9 +1,16 @@
+import datetime
 import http.server
 import json
 import urllib.parse
 from SessionDataDownloader import *
 from StandingsDownloader import *
 from WDC_possible_winners import *
+
+
+def write_error_log(message):
+    date = datetime.datetime.now()
+    with open('error.log', 'a') as f:
+        f.write(str(date) + " " + str(message) + "\n")
 
 
 class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
@@ -122,7 +129,8 @@ class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.end_headers()
 
             self.wfile.write(json.dumps(data).encode())
-        except:
+        except Exception as e:
+            write_error_log(e)
             self.send_error(500)
 
     def do_OPTIONS(self):

@@ -3,3 +3,4 @@ cache/
 images/
 __pycache__/
 nohup.out
+error.log
