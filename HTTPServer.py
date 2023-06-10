@@ -91,7 +91,6 @@ class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                     self.send_error(400)
                     return
 
-
             elif parsed_path.path == '/winners':
                 driver_standings = get_drivers_standings()
                 points = calculate_max_points_for_remaining_season()
