@@ -6,6 +6,7 @@ from StandingsDownloader import *
 from WDC_possible_winners import *
 
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
 CORS(app)
 
 
@@ -23,7 +24,9 @@ def schedule():
 def winners():
     driver_standings = get_drivers_standings()
     points = calculate_max_points_for_remaining_season()
-    return {'status': '200', 'data': calculate_who_can_win(driver_standings, points)}, 200
+    win = calculate_who_can_win(driver_standings, points)
+
+    return json.dumps({'status': '200', 'data': win}), 200
 
 
 @app.route('/sessions')
