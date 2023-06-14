@@ -98,4 +98,5 @@ def telemetry():
     return {'status': '200', 'data': load_lap_telemetry(int(year), int(event), session, driver, int(lap))}
 
 
-app.run()
+if __name__ == '__main__':
+    app.run()

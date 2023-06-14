@@ -4,3 +4,4 @@ images/
 __pycache__/
 nohup.out
 error.log
+app.wsgi
