@@ -6,7 +6,7 @@ import json
 import os
 import pycountry
 
-fastf1.Cache.enable_cache('cache')
+fastf1.Cache.enable_cache(os.getcwd() + '/cache')
 
 
 def get_cached_data_round(year, cache_name):

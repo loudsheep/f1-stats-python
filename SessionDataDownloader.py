@@ -3,9 +3,10 @@ import fastf1
 import json
 import pytz
 import pycountry
+import os
 
 utc = pytz.UTC
-fastf1.Cache.enable_cache('cache')
+fastf1.Cache.enable_cache(os.getcwd() + '/cache')
 
 
 def load_lap_telemetry(year, event, ses, driver, lap_number):

@@ -1,8 +1,9 @@
 import requests
 import fastf1
 import json
+import os
 
-fastf1.Cache.enable_cache("cache")  # replace with your cache directory
+fastf1.Cache.enable_cache(os.getcwd() + '/cache')  # replace with your cache directory
 
 
 def get_drivers_standings():
