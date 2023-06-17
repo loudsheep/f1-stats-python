@@ -6,7 +6,8 @@ import pycountry
 import os
 
 utc = pytz.UTC
-fastf1.Cache.enable_cache(os.getcwd() + '/cache')
+
+fastf1.Cache.enable_cache(os.path.join(os.path.dirname(__file__), 'cache'))
 
 
 def load_lap_telemetry(year, event, ses, driver, lap_number):

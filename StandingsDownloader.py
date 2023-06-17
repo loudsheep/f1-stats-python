@@ -6,11 +6,12 @@ import json
 import os
 import pycountry
 
-fastf1.Cache.enable_cache(os.getcwd() + '/cache')
+fastf1.Cache.enable_cache(os.path.join(os.path.dirname(__file__), 'cache'))
 
 
 def get_cached_data_round(year, cache_name):
-    if os.path.exists('./cache/' + cache_name + '/' + str(year) + '.txt'):
+    file_path = os.path.join(os.path.dirname(__file__), 'cache')
+    if os.path.exists(file_path + '/' + cache_name + '/' + str(year) + '.txt'):
         with open('./cache/' + cache_name + '/' + str(year) + '.txt') as f:
             lines = f.readlines()
             round = int(lines[0])
@@ -20,8 +21,9 @@ def get_cached_data_round(year, cache_name):
 
 
 def get_cached_data(year, cache_name):
-    if os.path.exists('./cache/' + cache_name + '/' + str(year) + '.txt'):
-        with open('./cache/' + cache_name + '/' + str(year) + '.txt') as f:
+    file_path = os.path.join(os.path.dirname(__file__), 'cache')
+    if os.path.exists(file_path + '/' + cache_name + '/' + str(year) + '.txt'):
+        with open(file_path + '/' + cache_name + '/' + str(year) + '.txt') as f:
             lines = f.readlines()
             data = lines[1]
         return json.loads(data)
@@ -30,10 +32,11 @@ def get_cached_data(year, cache_name):
 
 
 def write_to_cache(year, cache_name, round, data):
-    if not os.path.exists('./cache/' + cache_name + '/'):
-        os.makedirs('./cache/' + cache_name + '/')
+    file_path = os.path.join(os.path.dirname(__file__), 'cache')
+    if not os.path.exists(file_path + '/' + cache_name + '/'):
+        os.makedirs(file_path + '/' + cache_name + '/')
 
-    with open('./cache/' + cache_name + '/' + str(year) + '.txt', 'w') as f:
+    with open(file_path + '/' + cache_name + '/' + str(year) + '.txt', 'w') as f:
         f.writelines([str(round) + '\n', data])
 
 
@@ -268,7 +271,6 @@ def get_qualifying_position_heatmap_data(year: int):
     write_to_cache(year, 'quali', last_round, json.dumps(ret))
 
     return ret
-
 
 # print(get_race_positions(2022))
 # print(get_season_standings(2023))
