@@ -12,7 +12,7 @@ fastf1.Cache.enable_cache(os.path.join(os.path.dirname(__file__), 'cache'))
 def get_cached_data_round(year, cache_name):
     file_path = os.path.join(os.path.dirname(__file__), 'cache')
     if os.path.exists(file_path + '/' + cache_name + '/' + str(year) + '.txt'):
-        with open('./cache/' + cache_name + '/' + str(year) + '.txt') as f:
+        with open(file_path + '/' + cache_name + '/' + str(year) + '.txt') as f:
             lines = f.readlines()
             round = int(lines[0])
         return round
