@@ -271,7 +271,3 @@ def get_qualifying_position_heatmap_data(year: int):
     write_to_cache(year, 'quali', last_round, json.dumps(ret))
 
     return ret
-
-# print(get_race_positions(2022))
-# print(get_season_standings(2023))
-# print(get_qualifying_position_heatmap_data(2023))

@@ -51,6 +51,18 @@ def results():
     return {'status': '200', 'data': get_session_results(int(year), int(event), session)}, 200
 
 
+@app.route('/tires')
+def tires():
+    try:
+        year = request.args['year']
+        event = request.args['event']
+        session = request.args['session']
+    except KeyError:
+        return {'status': '400', 'data': 'Missing params'}, 400
+
+    return {'status': '200', 'data': get_session_compounds_used(int(year), int(event), session)}, 200
+
+
 @app.route('/laps')
 def laps():
     try:
