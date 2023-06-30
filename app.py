@@ -48,7 +48,12 @@ def results():
     except KeyError:
         return {'status': '400', 'data': 'Missing params'}, 400
 
-    return {'status': '200', 'data': get_session_results(int(year), int(event), session)}, 200
+    try:
+        results = get_session_results(int(year), int(event), session)
+    except:
+        return {'status': '500', 'data': 'Internal server error or no data available'}, 500
+
+    return {'status': '200', 'data': results}, 200
 
 
 @app.route('/tires')

@@ -86,7 +86,7 @@ def get_past_events(year: int):
     events = fastf1.get_event_schedule(year, include_testing=False)
     next_event = fastf1.get_events_remaining().iloc[0]
 
-    events = events.loc[events['Session5Date'] < next_event['Session5Date']]
+    events = events.loc[events['Session5Date'] <= next_event['Session5Date']]
     events = events[
         ['RoundNumber', 'Country', 'Location', 'OfficialEventName', 'EventDate', 'EventName', 'EventFormat']]
     events = events.to_json(
