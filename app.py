@@ -65,7 +65,7 @@ def tires():
     except KeyError:
         return {'status': '400', 'data': 'Missing params'}, 400
 
-    return {'status': '200', 'data': get_session_compounds_used(int(year), int(event), session)}, 200
+    return jsonify({'status': '200', 'data': get_session_compounds_used(int(year), int(event), session)}), 200
 
 
 @app.route('/laps')
@@ -78,7 +78,7 @@ def laps():
     except KeyError:
         return {'status': '400', 'data': 'Missing params'}, 400
 
-    return {'status': '200', 'data': load_chart_data(int(year), int(event), session, driver)}
+    return {'status': '200', 'data': load_chart_data(int(year), int(event), session, driver)}, 200
 
 
 @app.route('/heatmap')
@@ -98,7 +98,7 @@ def heatmap():
     else:
         return {'status': '400', 'data': 'Unknown category: ' + category}, 400
 
-    return {'status': '200', 'data': data}
+    return {'status': '200', 'data': data}, 200
 
 
 @app.route('/telemetry')
@@ -112,7 +112,7 @@ def telemetry():
     except KeyError:
         return {'status': '400', 'data': 'Missing params'}, 400
 
-    return {'status': '200', 'data': load_lap_telemetry(int(year), int(event), session, driver, int(lap))}
+    return {'status': '200', 'data': load_lap_telemetry(int(year), int(event), session, driver, int(lap))}, 200
 
 
 if __name__ == '__main__':

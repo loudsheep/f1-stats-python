@@ -129,18 +129,13 @@ def get_session_results(year, event, session):
 
 
 def get_session_compounds_used(year, event, session):
-    if session == "SS":
-        session = "SQ"
-    elif session == "Sprint Shootout":
-        session = "Sprint Qualifying"
-
     session = fastf1.get_session(year, event, session)
     session.load(telemetry=False, weather=False, messages=False, laps=True)
 
     laps = session.laps
 
     stints = laps[["Driver", "Stint", "Compound", "LapNumber"]]
-    stints = stints.groupby(["Driver", "Stint", "Compound"])
+    stints = stints.groupby(["Driver", "Stint", "Compound"], sort=False)
     stints = stints.count().reset_index()
     stints = stints.rename(columns={"LapNumber": "StintLength"})
 
