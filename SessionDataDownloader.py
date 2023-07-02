@@ -117,15 +117,7 @@ def get_past_events(year: int):
     return events
 
 
-print(get_past_events(2023))
-
-
 def get_session_results(year, event, session):
-    if session == "SS":
-        session = "SQ"
-    elif session == "Sprint Shootout":
-        session = "Sprint Qualifying"
-
     session = fastf1.get_session(year, event, session)
     session.load(telemetry=False, weather=False, messages=False, laps=False)
 
