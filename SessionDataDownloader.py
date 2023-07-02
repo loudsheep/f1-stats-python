@@ -1,9 +1,11 @@
 import datetime
 import fastf1
+import fastf1.plotting
 import json
 import pytz
 import pycountry
 import os
+import numpy as np
 
 utc = pytz.UTC
 
@@ -82,11 +84,24 @@ def get_events_remaining():
     return json.loads(events)
 
 
+def get_sessions_in_event(year: int, event: int | str):
+    event = fastf1.get_event(year, event)
+
+    sessions = []
+    for i in range(1, 6):
+        if event["Session" + str(i) + "DateUtc"] is None:
+            continue
+        if event["Session" + str(i) + "DateUtc"].replace(tzinfo=utc) < datetime.datetime.now().replace(tzinfo=utc):
+            sessions.append(event["Session" + str(i)])
+
+    return sessions
+
+
 def get_past_events(year: int):
     events = fastf1.get_event_schedule(year, include_testing=False)
     next_event = fastf1.get_events_remaining().iloc[0]
 
-    events = events.loc[events['Session5Date'] <= next_event['Session5Date']]
+    events = events.loc[events['Session5DateUtc'] <= next_event['Session5DateUtc']]
     events = events[
         ['RoundNumber', 'Country', 'Location', 'OfficialEventName', 'EventDate', 'EventName', 'EventFormat']]
     events = events.to_json(
@@ -96,21 +111,13 @@ def get_past_events(year: int):
 
     for i in events:
         i['Sessions'] = get_sessions_in_event(year, i['RoundNumber'])
+        if len(i['Sessions']) == 0:
+            events.remove(i)
 
     return events
 
 
-def get_sessions_in_event(year: int, event: int | str):
-    event = fastf1.get_event(year, event)
-
-    sessions = []
-    for i in range(1, 6):
-        if event["Session" + str(i) + "Date"] is None:
-            continue
-        if event["Session" + str(i) + "Date"].replace(tzinfo=utc) < datetime.datetime.now().replace(tzinfo=utc):
-            sessions.append(event["Session" + str(i)])
-
-    return sessions
+print(get_past_events(2023))
 
 
 def get_session_results(year, event, session):
@@ -146,3 +153,21 @@ def get_session_compounds_used(year, event, session):
     stints = stints.rename(columns={"LapNumber": "StintLength"})
 
     return json.loads(stints.to_json(orient="records", date_format="iso"))
+
+
+# TODO add driver color to result
+def get_race_position_changes(year, event):
+    session = fastf1.get_session(year, event, 'R')
+    session.load(telemetry=False, weather=False)
+
+    result = {}
+    for drv in session.drivers:
+        drv_laps = session.laps.pick_driver(drv)
+
+        abb = drv_laps['Driver'].iloc[0]
+        color = fastf1.plotting.driver_color(abb)
+        print(abb, color)
+
+        result[abb] = json.loads(drv_laps[['LapNumber', 'Position']].to_json(orient="records", date_format="iso"))
+
+    return result
