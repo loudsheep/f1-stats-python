@@ -1,6 +1,6 @@
 import requests
 import fastf1
-import json
+from fastf1.plotting import team_color
 import os
 
 fastf1.Cache.enable_cache(os.path.join(os.path.dirname(__file__), 'cache'))  # replace with your cache directory
@@ -37,13 +37,15 @@ def calculate_who_can_win(driver_standings, max_points):
 
     obj = {}
     for _, driver in enumerate(driver_standings):
+        print(driver)
         driver_max_points = int(driver["points"]) + max_points
         can_win = 'No' if driver_max_points < LEADER_POINTS else 'Yes'
 
         obj[driver['Driver']['code']] = {
             "current_points": int(driver['points']),
             "max_points": driver_max_points,
-            "can_win": True if can_win == "Yes" else False
+            "can_win": True if can_win == "Yes" else False,
+            "color": team_color(driver['Constructors'][0]['name'])
         }
 
     return obj
