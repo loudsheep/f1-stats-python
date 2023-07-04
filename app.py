@@ -4,6 +4,7 @@ from flask_cors import CORS
 from SessionDataDownloader import *
 from StandingsDownloader import *
 from WDC_possible_winners import *
+from GeneralStatsDownloader import *
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
@@ -79,6 +80,12 @@ def laps():
         return {'status': '400', 'data': 'Missing params'}, 400
 
     return {'status': '200', 'data': load_chart_data(int(year), int(event), session, driver)}, 200
+
+
+# TODO set year dynamically
+@app.route('/lap-leaders')
+def lap_leaders():
+    return {'status': '200', 'data': count_laps_finished_as_leader(2023)}, 200
 
 
 @app.route('/heatmap')

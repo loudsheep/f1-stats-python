@@ -1,6 +1,6 @@
 import fastf1
 from fastf1.ergast import Ergast
-from fastf1.plotting import team_color
+from fastf1.plotting import team_color, driver_color
 import pandas as pd
 import os
 import json
@@ -46,7 +46,6 @@ def index_of_driver(data, driver):
     return -1
 
 
-# TODO session HAS to be only Race or Sprint
 def count_laps_finished_as_leader(year):
     ergast = Ergast()
     races = ergast.get_race_schedule(year)
@@ -88,7 +87,7 @@ def count_laps_finished_as_leader(year):
                         data.append({
                             "driver": driver,
                             "laps": 1,
-                            "color": team_color(team)
+                            "color": driver_color(driver)
                         })
         except:
             write_to_cache(2023, 'race_leader', round - 1, json.dumps(data))
