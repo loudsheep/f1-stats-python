@@ -21,14 +21,11 @@ def calculate_max_points_for_remaining_season():
     POINTS_FOR_CONVENTIONAL = 25 + 1  # Winning the race and fastest lap
 
     events = fastf1.events.get_events_remaining()
-    print(events[['EventFormat']])
     # Count how many sprints and conventional races are left
     sprint_events = \
         len(events.loc[events["EventFormat"] == "sprint"]) + len(events.loc[events["EventFormat"] == "sprint_shootout"])
     conventional_events = \
         len(events.loc[events["EventFormat"] == "conventional"])
-
-    print(sprint_events, conventional_events)
 
     # Calculate points for each
     sprint_points = sprint_events * POINTS_FOR_SPRINT
