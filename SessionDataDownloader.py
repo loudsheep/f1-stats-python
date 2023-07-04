@@ -5,7 +5,6 @@ import json
 import pytz
 import pycountry
 import os
-import numpy as np
 
 utc = pytz.UTC
 
