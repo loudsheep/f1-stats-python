@@ -57,9 +57,9 @@ def load_chart_data(year, event, session, driver):
     session.load(telemetry=False, weather=False, messages=False)
 
     driver_laps = session.laps.pick_driver(driver)
-    driver_laps = driver_laps.drop(driver_laps[driver_laps.IsAccurate == False].index)
+    # driver_laps = driver_laps.drop(driver_laps[driver_laps.IsAccurate == False].index)
 
-    return json.loads(driver_laps[['LapNumber', 'LapTime', 'Compound']].to_json(orient="records"))
+    return json.loads(driver_laps[['LapNumber', 'LapTime', 'Compound', 'IsAccurate']].to_json(orient="records"))
 
 
 def add_country_code(pd_row):

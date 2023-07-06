@@ -29,7 +29,7 @@ def index():
 
 
 @app.route('/schedule')
-@cache.cached(timeout=DAY)
+@cache.cached(timeout=DAY * 3)
 def schedule():
     return {'status': '200', 'data': get_events_remaining()}, 200
 
@@ -44,98 +44,57 @@ def winners():
     return json.dumps({'status': '200', 'data': win}), 200
 
 
-@app.route('/sessions')
+@app.route('/sessions/<int:year>')
 @cache.cached(timeout=DAY * 7)
-def sessions():
-    try:
-        year = request.args['year']
-    except KeyError:
-        return {'status': '400', 'data': 'Missing params'}, 400
-
+def sessions(year: int):
     return {'status': '200', 'data': get_past_events(int(year))}, 200
 
 
-@app.route('/results')
+@app.route('/results/<int:year>/<int:event>/<string:session>')
 @cache.cached(timeout=DAY)
-def results():
+def results(year: int, event: int, session: str):
     try:
-        year = request.args['year']
-        event = request.args['event']
-        session = request.args['session']
-    except KeyError:
-        return {'status': '400', 'data': 'Missing params'}, 400
-
-    try:
-        results = get_session_results(int(year), int(event), session)
+        results = get_session_results(year, event, session)
     except:
         return {'status': '500', 'data': 'Internal server error or no data available'}, 500
 
     return {'status': '200', 'data': results}, 200
 
 
-@app.route('/tires')
-def tires():
-    try:
-        year = request.args['year']
-        event = request.args['event']
-        session = request.args['session']
-    except KeyError:
-        return {'status': '400', 'data': 'Missing params'}, 400
-
-    return jsonify({'status': '200', 'data': get_session_compounds_used(int(year), int(event), session)}), 200
+@app.route('/tires/<int:year>/<int:event>/<string:session>')
+def tires(year: int, event: int, session: str):
+    return jsonify({'status': '200', 'data': get_session_compounds_used(year, event, session)}), 200
 
 
-@app.route('/laps')
-def laps():
-    try:
-        year = request.args['year']
-        event = request.args['event']
-        session = request.args['session']
-        driver = request.args['driver']
-    except KeyError:
-        return {'status': '400', 'data': 'Missing params'}, 400
-
-    return {'status': '200', 'data': load_chart_data(int(year), int(event), session, driver)}, 200
+@app.route('/laps/<int:year>/<int:event>/<string:session>/<string:driver>')
+def laps(year: int, event: int, session: str, driver: str):
+    return {'status': '200', 'data': load_chart_data(year, event, session, driver)}, 200
 
 
 # TODO set year dynamically
 @app.route('/lap-leaders')
+@cache.cached(timeout=DAY)
 def lap_leaders():
     return {'status': '200', 'data': count_laps_finished_as_leader(2023)}, 200
 
 
-@app.route('/heatmap')
-def heatmap():
-    try:
-        year = request.args['year']
-        category = request.args['category']
-    except KeyError:
-        return {'status': '400', 'data': 'Missing params'}, 400
-
+@app.route('/heatmap/<int:year>/<string:category>')
+def heatmap(year: int, category: str):
     if category == "points":
-        data = get_points_heatmap_data(int(year))
+        data = get_points_heatmap_data(year)
     elif category == "positions":
-        data = get_race_position_heatmap_data(int(year))
+        data = get_race_position_heatmap_data(year)
     elif category == "qualifying":
-        data = get_qualifying_position_heatmap_data(int(year))
+        data = get_qualifying_position_heatmap_data(year)
     else:
         return {'status': '400', 'data': 'Unknown category: ' + category}, 400
 
     return {'status': '200', 'data': data}, 200
 
 
-@app.route('/telemetry')
-def telemetry():
-    try:
-        year = request.args['year']
-        event = request.args['event']
-        session = request.args['session']
-        driver = request.args['driver']
-        lap = request.args['lap']
-    except KeyError:
-        return {'status': '400', 'data': 'Missing params'}, 400
-
-    return {'status': '200', 'data': load_lap_telemetry(int(year), int(event), session, driver, int(lap))}, 200
+@app.route('/telemetry/<int:year>/<int:event>/<string:session>/<string:driver>/<int:lap>')
+def telemetry(year: int, event: int, session: str, driver: str, lap: int):
+    return {'status': '200', 'data': load_lap_telemetry(year, event, session, driver, lap)}, 200
 
 
 if __name__ == '__main__':
