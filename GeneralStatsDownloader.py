@@ -245,11 +245,11 @@ def count_total_pole_positions(year):
                     idx = index_of_driver(data, driver)
 
                     if idx >= 0:
-                        data[idx]["podiums"] += 1
+                        data[idx]["poles"] += 1
                     else:
                         data.append({
                             "driver": driver,
-                            "podiums": 1,
+                            "poles": 1,
                             "color": driver_color(driver)
                         })
 

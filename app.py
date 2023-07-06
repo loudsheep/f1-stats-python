@@ -1,14 +1,26 @@
 import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_caching import Cache
 from SessionDataDownloader import *
 from StandingsDownloader import *
 from WDC_possible_winners import *
 from GeneralStatsDownloader import *
 
+config = {
+    "DEBUG": False,
+    'JSON_SORT_KEYS': False,
+    "CACHE_TYPE": "SimpleCache",
+    "CACHE_DEFAULT_TIMEOUT": 300,
+}
+
 app = Flask(__name__)
-app.config['JSON_SORT_KEYS'] = False
+app.config.from_mapping(config)
+cache = Cache(app)
 CORS(app)
+
+HOUR = 60 * 60
+DAY = 60 * 60 * 24
 
 
 @app.route('/')
@@ -17,11 +29,13 @@ def index():
 
 
 @app.route('/schedule')
+@cache.cached(timeout=DAY)
 def schedule():
     return {'status': '200', 'data': get_events_remaining()}, 200
 
 
 @app.route('/winners')
+@cache.cached(timeout=DAY)
 def winners():
     driver_standings = get_drivers_standings()
     points = calculate_max_points_for_remaining_season()
@@ -31,6 +45,7 @@ def winners():
 
 
 @app.route('/sessions')
+@cache.cached(timeout=DAY * 7)
 def sessions():
     try:
         year = request.args['year']
@@ -41,6 +56,7 @@ def sessions():
 
 
 @app.route('/results')
+@cache.cached(timeout=DAY)
 def results():
     try:
         year = request.args['year']
