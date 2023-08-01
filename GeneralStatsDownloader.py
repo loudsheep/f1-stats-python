@@ -95,6 +95,16 @@ def count_laps_finished_as_leader(year):
                             "value": 1,
                             "color": team_color(team)
                         })
+                else:
+                    idx = index_of_driver(data, driver)
+                    if idx < 0:
+                        data.append({
+                            "driver": driver,
+                            "team": team,
+                            "value": 0,
+                            "color": team_color(team)
+                        })
+
         except:
             write_to_cache(2023, 'race_leader', round - 1, json.dumps(data))
 
@@ -214,6 +224,15 @@ def count_total_podiums(year):
                             "value": 1,
                             "color": team_color(team)
                         })
+                else:
+                    idx = index_of_driver(data, driver)
+                    if idx < 0:
+                        data.append({
+                            "driver": driver,
+                            "team": team,
+                            "value": 0,
+                            "color": team_color(team)
+                        })
 
         except:
             write_to_cache(2023, 'race_podiums', round - 1, json.dumps(data))
@@ -270,6 +289,15 @@ def count_total_pole_positions(year):
                             "value": 1,
                             "color": team_color(team)
                         })
+                else:
+                    idx = index_of_driver(data, driver)
+                    if idx < 0:
+                        data.append({
+                            "driver": driver,
+                            "team": team,
+                            "value": 0,
+                            "color": team_color(team)
+                        })
 
         except:
             write_to_cache(2023, 'pole_positions', round - 1, json.dumps(data))
@@ -324,6 +352,15 @@ def count_top_10_race_finishes(year):
                             "driver": driver,
                             "team": team,
                             "value": 1,
+                            "color": team_color(team)
+                        })
+                else:
+                    idx = index_of_driver(data, driver)
+                    if idx < 0:
+                        data.append({
+                            "driver": driver,
+                            "team": team,
+                            "value": 0,
                             "color": team_color(team)
                         })
 

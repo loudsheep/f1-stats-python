@@ -106,7 +106,7 @@ def compare(category: str):
         data = count_total_podiums(year)
     elif category == "poles":
         data = count_total_pole_positions(year)
-    elif category == "leaders":
+    elif category == "leader":
         data = count_laps_finished_as_leader(year)
     elif category == "top10":
         data = count_top_10_race_finishes(year)
