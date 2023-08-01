@@ -55,6 +55,7 @@ def calculate_who_can_win(driver_standings, max_points):
 
         obj[driver['Driver']['code']] = {
             "current_points": int(driver['points']),
+            "wins": int(driver['wins']),
             "max_points": driver_max_points,
             "can_win": True if can_win == "Yes" else False,
             "max_position": max_position,

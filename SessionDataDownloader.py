@@ -52,48 +52,6 @@ def load_lap_telemetry(year, event, ses, driver, lap_number):
     return obj
 
 
-def tmp():
-    session = fastf1.get_session(2023, 11, 'Q')
-    session.load(weather=False, messages=False)
-
-    driver_laps = session.laps.pick_driver("VER")
-
-    telemetry = driver_laps.loc[driver_laps['LapNumber'] == 17].get_telemetry().add_distance()
-
-    # telemetry["DRS"].replace(
-    #     {0: False, 1: False, 2: False, 3: False, 8: False, 10: True, 12: True,
-    #      14: True}, inplace=True)
-
-    # track_map = telemetry[['X', 'Y']].to_json(orient="records")
-    # time = telemetry[['Distance', 'Time']].to_json(orient="records").replace("Distance", "X").replace("Time", "Y")
-    # throttle = telemetry[['Distance', 'Throttle']].to_json(orient="records").replace("Distance", "X").replace(
-    #     "Throttle", "Y")
-    # brake = telemetry[['Distance', 'Brake']].to_json(orient="records").replace("Distance", "X").replace("Brake", "Y")
-    # speed = telemetry[['Distance', 'Speed']].to_json(orient="records").replace("Distance", "X").replace("Speed", "Y")
-    # rpm = telemetry[['Distance', 'RPM']].to_json(orient="records").replace("Distance", "X").replace("RPM", "Y")
-    # gear = telemetry[['Distance', 'nGear']].to_json(orient="records").replace("Distance", "X").replace("nGear", "Y")
-    # drs = telemetry[['Distance', 'DRS']].to_json(orient="records").replace("Distance", "X").replace("DRS", "Y")
-
-    result = telemetry[['Distance', 'Time', 'X', 'Y', 'Speed']].to_json(orient="records")
-    print(result)
-    return result
-
-    # obj = {
-    #
-    #     "brake": json.loads(brake),
-    #     "drs": json.loads(drs),
-    #     "gear": json.loads(gear),
-    #     "rpm": json.loads(rpm),
-    #     "speed": json.loads(speed),
-    #     "throttle": json.loads(throttle),
-    #     "time": json.loads(time),
-    #     "track_map": json.loads(track_map)
-    # }
-    # return obj
-
-tmp()
-
-
 def load_chart_data(year, event, session, driver):
     session = fastf1.get_session(year, event, session)
     session.load(telemetry=False, weather=False, messages=False)
@@ -191,8 +149,9 @@ def get_race_position_changes(year, event):
     result = {}
     for drv in session.drivers:
         drv_laps = session.laps.pick_driver(drv)
+        # print(drv_laps)
 
-        abb = drv_laps['Driver'].iloc[0]
+        abb = drv_laps.iloc[0]['Driver']
         color = fastf1.plotting.driver_color(abb)
         print(abb, color)
 

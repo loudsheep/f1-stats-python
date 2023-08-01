@@ -46,10 +46,12 @@ def index_of_driver(data, driver):
     return -1
 
 
+# ------------ stats ------------ #
 def count_laps_finished_as_leader(year):
     ergast = Ergast()
     races = ergast.get_race_schedule(year)
 
+    # check the cache for saved data
     last_round = 0
     for index, race in races.iterrows():
         if race['raceDate'].date() < pd.Timestamp.today().date():
@@ -58,16 +60,19 @@ def count_laps_finished_as_leader(year):
             break
     cached_data_round = get_cached_data_round(year, 'race_leader')
 
+    # if cached data is up-to-date return it
     if cached_data_round >= last_round:
         return get_cached_data(year, 'race_leader')
 
     ######################
 
+    # else load the cached data and append the latest information to it
     if cached_data_round > 0:
         data = get_cached_data(2023, 'race_leader')
     else:
         data = []
 
+    # for every round in the season
     for round in range(cached_data_round + 1, last_round + 1):
         try:
             session = fastf1.get_session(year, round, 'R')
@@ -82,12 +87,13 @@ def count_laps_finished_as_leader(year):
                     idx = index_of_driver(data, driver)
 
                     if idx >= 0:
-                        data[idx]["laps"] += 1
+                        data[idx]["value"] += 1
                     else:
                         data.append({
                             "driver": driver,
-                            "laps": 1,
-                            "color": driver_color(driver)
+                            "team": team,
+                            "value": 1,
+                            "color": team_color(team)
                         })
         except:
             write_to_cache(2023, 'race_leader', round - 1, json.dumps(data))
@@ -127,7 +133,6 @@ def count_total_wins(year):
             session.load(laps=False, telemetry=False, weather=False, messages=False)
 
             for lap in session.results.iterrows():
-                print(lap)
                 driver = lap[1]["Abbreviation"]
                 team = lap[1]["TeamName"]
                 position = lap[1]["Position"]
@@ -136,13 +141,24 @@ def count_total_wins(year):
                     idx = index_of_driver(data, driver)
 
                     if idx >= 0:
-                        data[idx]["wins"] += 1
+                        data[idx]["value"] += 1
                     else:
                         data.append({
                             "driver": driver,
-                            "wins": 1,
-                            "color": driver_color(driver)
+                            "team": team,
+                            "value": 1,
+                            "color": team_color(team)
                         })
+                else:
+                    idx = index_of_driver(data, driver)
+                    if idx < 0:
+                        data.append({
+                            "driver": driver,
+                            "team": team,
+                            "value": 0,
+                            "color": team_color(team)
+                        })
+
         except:
             write_to_cache(2023, 'race_wins', round - 1, json.dumps(data))
 
@@ -190,12 +206,13 @@ def count_total_podiums(year):
                     idx = index_of_driver(data, driver)
 
                     if idx >= 0:
-                        data[idx]["podiums"] += 1
+                        data[idx]["value"] += 1
                     else:
                         data.append({
                             "driver": driver,
-                            "podiums": 1,
-                            "color": driver_color(driver)
+                            "team": team,
+                            "value": 1,
+                            "color": team_color(team)
                         })
 
         except:
@@ -245,12 +262,13 @@ def count_total_pole_positions(year):
                     idx = index_of_driver(data, driver)
 
                     if idx >= 0:
-                        data[idx]["poles"] += 1
+                        data[idx]["value"] += 1
                     else:
                         data.append({
                             "driver": driver,
-                            "poles": 1,
-                            "color": driver_color(driver)
+                            "team": team,
+                            "value": 1,
+                            "color": team_color(team)
                         })
 
         except:
@@ -259,5 +277,175 @@ def count_total_pole_positions(year):
         print("Downloaded data from round:", round)
 
     write_to_cache(2023, 'pole_positions', last_round, json.dumps(data))
+
+    return data
+
+
+def count_top_10_race_finishes(year):
+    ergast = Ergast()
+    races = ergast.get_race_schedule(year)
+
+    last_round = 0
+    for index, race in races.iterrows():
+        if race['raceDate'].date() < pd.Timestamp.today().date():
+            last_round = race['round']
+        else:
+            break
+    cached_data_round = get_cached_data_round(year, 'race_top_10')
+
+    if cached_data_round >= last_round:
+        return get_cached_data(year, 'race_top_10')
+
+    ######################
+
+    if cached_data_round > 0:
+        data = get_cached_data(2023, 'race_top_10')
+    else:
+        data = []
+
+    for round in range(cached_data_round + 1, last_round + 1):
+        try:
+            session = fastf1.get_session(year, round, 'R')
+            session.load(laps=False, telemetry=False, weather=False, messages=False)
+
+            for lap in session.results.iterrows():
+                # print(lap)
+                driver = lap[1]["Abbreviation"]
+                team = lap[1]["TeamName"]
+                position = int(lap[1]["Position"])
+
+                if position <= 10:
+                    idx = index_of_driver(data, driver)
+
+                    if idx >= 0:
+                        data[idx]["value"] += 1
+                    else:
+                        data.append({
+                            "driver": driver,
+                            "team": team,
+                            "value": 1,
+                            "color": team_color(team)
+                        })
+
+        except:
+            write_to_cache(2023, 'race_top_10', round - 1, json.dumps(data))
+
+        print("Downloaded data from round:", round)
+
+    write_to_cache(2023, 'race_top_10', last_round, json.dumps(data))
+
+    return data
+
+
+def best_result(year):
+    ergast = Ergast()
+    races = ergast.get_race_schedule(year)
+
+    last_round = 0
+    for index, race in races.iterrows():
+        if race['raceDate'].date() < pd.Timestamp.today().date():
+            last_round = race['round']
+        else:
+            break
+    cached_data_round = get_cached_data_round(year, 'best_result')
+
+    if cached_data_round >= last_round:
+        return get_cached_data(year, 'best_result')
+
+    ######################
+
+    if cached_data_round > 0:
+        data = get_cached_data(2023, 'best_result')
+    else:
+        data = []
+
+    for round in range(cached_data_round + 1, last_round + 1):
+        try:
+            session = fastf1.get_session(year, round, 'R')
+            session.load(laps=False, telemetry=False, weather=False, messages=False)
+
+            for lap in session.results.iterrows():
+                # print(lap)
+                driver = lap[1]["Abbreviation"]
+                team = lap[1]["TeamName"]
+                position = int(lap[1]["Position"])
+
+                idx = index_of_driver(data, driver)
+
+                if idx >= 0:
+                    if position < data[idx]["value"]:
+                        data[idx]["value"] = position
+                else:
+                    data.append({
+                        "driver": driver,
+                        "team": team,
+                        "value": position,
+                        "color": team_color(team)
+                    })
+
+        except:
+            write_to_cache(2023, 'best_result', round - 1, json.dumps(data))
+
+        print("Downloaded data from round:", round)
+
+    write_to_cache(2023, 'best_result', last_round, json.dumps(data))
+
+    return data
+
+
+def worst_result(year):
+    ergast = Ergast()
+    races = ergast.get_race_schedule(year)
+
+    last_round = 0
+    for index, race in races.iterrows():
+        if race['raceDate'].date() < pd.Timestamp.today().date():
+            last_round = race['round']
+        else:
+            break
+    cached_data_round = get_cached_data_round(year, 'worst_result')
+
+    if cached_data_round >= last_round:
+        return get_cached_data(year, 'worst_result')
+
+    ######################
+
+    if cached_data_round > 0:
+        data = get_cached_data(2023, 'worst_result')
+    else:
+        data = []
+
+    for round in range(cached_data_round + 1, last_round + 1):
+        try:
+            session = fastf1.get_session(year, round, 'R')
+            session.load(laps=False, telemetry=False, weather=False, messages=False)
+
+            for lap in session.results.iterrows():
+                driver = lap[1]["Abbreviation"]
+                team = lap[1]["TeamName"]
+                position = int(lap[1]["Position"])
+
+                idx = index_of_driver(data, driver)
+
+                if (lap[1]["Status"] != "Finished") and ("Lap" not in lap[1]["Status"]):
+                    continue
+
+                if idx >= 0:
+                    if position > data[idx]["value"]:
+                        data[idx]["value"] = position
+                else:
+                    data.append({
+                        "driver": driver,
+                        "team": team,
+                        "value": position,
+                        "color": team_color(team)
+                    })
+
+        except:
+            write_to_cache(2023, 'worst_result', round - 1, json.dumps(data))
+
+        print("Downloaded data from round:", round)
+
+    write_to_cache(2023, 'worst_result', last_round, json.dumps(data))
 
     return data

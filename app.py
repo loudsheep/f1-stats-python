@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_caching import Cache
 from SessionDataDownloader import *
-from StandingsDownloader import *
+from HeatmapDataDownloader import *
 from WDC_possible_winners import *
 from GeneralStatsDownloader import *
 
@@ -45,7 +45,7 @@ def winners():
 
 
 @app.route('/sessions/<int:year>')
-@cache.cached(timeout=DAY * 7)
+@cache.cached(timeout=DAY * 3)
 def sessions(year: int):
     return {'status': '200', 'data': get_past_events(int(year))}, 200
 
@@ -95,6 +95,29 @@ def heatmap(year: int, category: str):
 @app.route('/telemetry/<int:year>/<int:event>/<string:session>/<string:driver>/<int:lap>')
 def telemetry(year: int, event: int, session: str, driver: str, lap: int):
     return {'status': '200', 'data': load_lap_telemetry(year, event, session, driver, lap)}, 200
+
+
+@app.route('/compare/<string:category>')
+def compare(category: str):
+    year = 2023
+    if category == "wins":
+        data = count_total_wins(year)
+    elif category == "podiums":
+        data = count_total_podiums(year)
+    elif category == "poles":
+        data = count_total_pole_positions(year)
+    elif category == "leaders":
+        data = count_laps_finished_as_leader(year)
+    elif category == "top10":
+        data = count_top_10_race_finishes(year)
+    elif category == "best":
+        data = best_result(year)
+    elif category == "worst":
+        data = worst_result(year)
+    else:
+        return {'status': '400', 'data': 'Unknown category: ' + category}, 400
+
+    return {'status': '200', 'data': data}, 200
 
 
 if __name__ == '__main__':
