@@ -59,7 +59,7 @@ def calculate_who_can_win(driver_standings, max_points):
             "max_points": driver_max_points,
             "can_win": True if can_win == "Yes" else False,
             "max_position": max_position,
-            "color": team_color(driver['Constructors'][0]['name'])
+            "color": team_color(driver['Constructors'][0]['constructorId'])
         }
 
     return obj

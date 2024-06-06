@@ -6,6 +6,7 @@ from SessionDataDownloader import *
 from HeatmapDataDownloader import *
 from WDC_possible_winners import *
 from GeneralStatsDownloader import *
+from datetime import date
 
 config = {
     "DEBUG": False,
@@ -21,6 +22,10 @@ CORS(app)
 
 HOUR = 60 * 60
 DAY = 60 * 60 * 24
+
+
+def current_year():
+    return date.today().year
 
 
 @app.route('/')
@@ -99,7 +104,7 @@ def telemetry(year: int, event: int, session: str, driver: str, lap: int):
 
 @app.route('/compare/<string:category>')
 def compare(category: str):
-    year = 2023
+    year = current_year()
     if category == "wins":
         data = count_total_wins(year)
     elif category == "podiums":
@@ -113,6 +118,8 @@ def compare(category: str):
     elif category == "best":
         data = best_result(year)
     elif category == "worst":
+        data = worst_result(year)
+    elif category == "points":
         data = worst_result(year)
     else:
         return {'status': '400', 'data': 'Unknown category: ' + category}, 400
