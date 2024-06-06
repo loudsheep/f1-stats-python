@@ -68,7 +68,7 @@ def count_laps_finished_as_leader(year):
 
     # else load the cached data and append the latest information to it
     if cached_data_round > 0:
-        data = get_cached_data(2023, 'race_leader')
+        data = get_cached_data(year, 'race_leader')
     else:
         data = []
 
@@ -106,11 +106,11 @@ def count_laps_finished_as_leader(year):
                         })
 
         except:
-            write_to_cache(2023, 'race_leader', round - 1, json.dumps(data))
+            write_to_cache(year, 'race_leader', round - 1, json.dumps(data))
 
         print("Downloaded data from round:", round)
 
-    write_to_cache(2023, 'race_leader', last_round, json.dumps(data))
+    write_to_cache(year, 'race_leader', last_round, json.dumps(data))
 
     return data
 
@@ -133,7 +133,7 @@ def count_total_wins(year):
     ######################
 
     if cached_data_round > 0:
-        data = get_cached_data(2023, 'race_wins')
+        data = get_cached_data(year, 'race_wins')
     else:
         data = []
 
@@ -170,11 +170,11 @@ def count_total_wins(year):
                         })
 
         except:
-            write_to_cache(2023, 'race_wins', round - 1, json.dumps(data))
+            write_to_cache(year, 'race_wins', round - 1, json.dumps(data))
 
         print("Downloaded data from round:", round)
 
-    write_to_cache(2023, 'race_wins', last_round, json.dumps(data))
+    write_to_cache(year, 'race_wins', last_round, json.dumps(data))
 
     return data
 
@@ -197,7 +197,7 @@ def count_total_podiums(year):
     ######################
 
     if cached_data_round > 0:
-        data = get_cached_data(2023, 'race_podiums')
+        data = get_cached_data(year, 'race_podiums')
     else:
         data = []
 
@@ -235,11 +235,11 @@ def count_total_podiums(year):
                         })
 
         except:
-            write_to_cache(2023, 'race_podiums', round - 1, json.dumps(data))
+            write_to_cache(year, 'race_podiums', round - 1, json.dumps(data))
 
         print("Downloaded data from round:", round)
 
-    write_to_cache(2023, 'race_podiums', last_round, json.dumps(data))
+    write_to_cache(year, 'race_podiums', last_round, json.dumps(data))
 
     return data
 
@@ -262,7 +262,7 @@ def count_total_pole_positions(year):
     ######################
 
     if cached_data_round > 0:
-        data = get_cached_data(2023, 'pole_positions')
+        data = get_cached_data(year, 'pole_positions')
     else:
         data = []
 
@@ -300,11 +300,11 @@ def count_total_pole_positions(year):
                         })
 
         except:
-            write_to_cache(2023, 'pole_positions', round - 1, json.dumps(data))
+            write_to_cache(year, 'pole_positions', round - 1, json.dumps(data))
 
         print("Downloaded data from round:", round)
 
-    write_to_cache(2023, 'pole_positions', last_round, json.dumps(data))
+    write_to_cache(year, 'pole_positions', last_round, json.dumps(data))
 
     return data
 
@@ -327,7 +327,7 @@ def count_top_10_race_finishes(year):
     ######################
 
     if cached_data_round > 0:
-        data = get_cached_data(2023, 'race_top_10')
+        data = get_cached_data(year, 'race_top_10')
     else:
         data = []
 
@@ -365,11 +365,11 @@ def count_top_10_race_finishes(year):
                         })
 
         except:
-            write_to_cache(2023, 'race_top_10', round - 1, json.dumps(data))
+            write_to_cache(year, 'race_top_10', round - 1, json.dumps(data))
 
         print("Downloaded data from round:", round)
 
-    write_to_cache(2023, 'race_top_10', last_round, json.dumps(data))
+    write_to_cache(year, 'race_top_10', last_round, json.dumps(data))
 
     return data
 
@@ -392,7 +392,7 @@ def best_result(year):
     ######################
 
     if cached_data_round > 0:
-        data = get_cached_data(2023, 'best_result')
+        data = get_cached_data(year, 'best_result')
     else:
         data = []
 
@@ -421,11 +421,11 @@ def best_result(year):
                     })
 
         except:
-            write_to_cache(2023, 'best_result', round - 1, json.dumps(data))
+            write_to_cache(year, 'best_result', round - 1, json.dumps(data))
 
         print("Downloaded data from round:", round)
 
-    write_to_cache(2023, 'best_result', last_round, json.dumps(data))
+    write_to_cache(year, 'best_result', last_round, json.dumps(data))
 
     return data
 
@@ -448,7 +448,7 @@ def worst_result(year):
     ######################
 
     if cached_data_round > 0:
-        data = get_cached_data(2023, 'worst_result')
+        data = get_cached_data(year, 'worst_result')
     else:
         data = []
 
@@ -479,10 +479,10 @@ def worst_result(year):
                     })
 
         except:
-            write_to_cache(2023, 'worst_result', round - 1, json.dumps(data))
+            write_to_cache(year, 'worst_result', round - 1, json.dumps(data))
 
         print("Downloaded data from round:", round)
 
-    write_to_cache(2023, 'worst_result', last_round, json.dumps(data))
+    write_to_cache(year, 'worst_result', last_round, json.dumps(data))
 
     return data
